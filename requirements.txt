@@ -1,4 +1,4 @@
 django
 gunicorn
 django-heroku
-vkbottle @ https://github.com/timoniq/vkbottle.git
+vkbottle @ https://github.com/timoniq/vkbottle/archive/master.zip
