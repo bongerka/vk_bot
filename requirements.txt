@@ -1,5 +1,4 @@
 django
 gunicorn
 django-heroku
-vkbottle_types
-vkbottle
+vkbottle @ https://github.com/timoniq/vkbottle.git
