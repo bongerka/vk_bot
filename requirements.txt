@@ -1,0 +1,6 @@
+django
+gunicorn
+django-heroku
+vkbottle_types
+vkbottle.bot
+vkbottle
