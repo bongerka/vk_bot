@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
-from random import shuffle, randint 
-import asyncio
+from random import shuffle, randint 	
+import asyncio											# python C:\Users\ПК\Downloads\sdvb.py
 from vkbottle_types import BaseStateGroup
-from vkbottle.bot import Bot, Message     									# python C:\Users\ПК\Downloads\lalala.py
+from vkbottle.bot import Bot, Message
 from vkbottle import (
 	Keyboard, 
 	KeyboardButtonColor, 
@@ -10,18 +9,23 @@ from vkbottle import (
 	)
 
 
-
-token = '29b86ae229fc76a29a88408f1f6277e959824731bd9f2b266c51ea41e6ac99cfae10310a761a532b3356e'
+token = '1eefd03cabef397c236c72b85a734fe05d3b73171a6dd9a01f4beb7c5c5aa6a08a814bbdbdcea81a23012'
 bot = Bot(token=token)
-chat_id = 57
-
-class menu(BaseStateGroup):
-	MENU_RUS = 3
+chat_id = 2*10**9+1
 
 
-@bot.loop_wrapper.interval(seconds=5)
+
+@bot.loop_wrapper.interval(seconds=36000)
 async def repeated_task():
-	pass
+	await bot.api.messages.send(peer_id=chat_id, random_id=0, message='Пора ботать')
+
+
+
+new_nums = []
+check_word = ''
+busy = False
+did_t = -2
+cor_t = 0
 
 bot_kb = (
 	Keyboard(one_time=False, inline=True)
@@ -39,273 +43,6 @@ menu_kb = (
 	.get_json()
 )
 
-
-class botat(BaseStateGroup):
-	BOT_RUS = 0
-	BOT_TASKS = 1
-	BOT_PRORAB = 2
-	BOT_TASKS7 = 4
-
-
-
-
-
-
-ex7 = """инструкторы 
-редакторы 
-лекторы
-ректоры 
-конструкторы 
-прожекторы 
-секторы 
-инженеры 
-шофёры
-бухгалтеры
-диспетчеры
-договоры
-приговоры
-плейеры
-драйверы
-грифели
-госпитали
-векселя
-вензеля
-кителя
-штабеля
-штемпеля
-тополя
-шомпола
-колокола
-купола
-слесари
-токари
-конюхи
-возрасты
-кремы
-супы
-грунты
-лифты
-порты
-склады
-торты
-флоты
-фронты
-штабы
-штурманы
-адреса
-бока
-борта
-века
-желоба
-жемчуга
-ботинок
-чулок
-шаровар
-шорт
-туфель
-сапог
-тапок
-тапочек
-галош
-бахил
-бутс
-валенок
-манжет
-серёг
-клипс
-носков
-гольфов
-рельсов
-бронхов
-джинсов
-лампасов
-бриджей
-блюдец
-зеркалец
-копытец(копытцев)
-одеялец
-полотенец
-сердец
-солнц
-болотцев
-кружевцев 
-деревцев
-оконцев
-апельсинов
-бананов
-огурцов
-бананов
-томатов
-помидоров
-гранатов
-абрикосов
-ананасов
-лимонов
-мандаринов
-баклажанов
-жернова
-края
-кузова
-окорока
-округа
-острова
-отпуска
-паруса
-паспорта
-погреба
-потроха
-снега
-стога
-сорта
-сторожа
-тетерева
-черепа
-директора
-профессора
-инспектора
-доктора
-катера
-ордера
-тенора
-фельдшера
-флюгера
-хутора
-шулера
-буфера
-веера
-буера
-яблок
-груш
-слив
-дынь
-повара
-принтеры""".split()
-
-
-
-
-
-#ex10 = []
-#with open(r'ex10.txt') as file:
-	#for i in file.readlines():
-	#	if '-' in i:
-	#		inp = [x.strip() for x in i.split('-')]
-	#		ex10.append(inp[0])
-	#		ex10.append(inp[1])
-	#	elif ',' in i:
-	#		ex10.extend(i.split(','))
-
-line1 = 'приоритет, привилегия, прибаутка, привередливый, пригожий, прибор, приличия, пристойно, приесться, приказ, приключения, прикорнуть, присяга, притеснять, причина, причуда, притязание, природа, пример, прическа, прискорбно, приволье, прицел, примета, приверженец, прилежный, причиндалы, приятный, приватный, принцип, примат, примитив, пригодный, присниться, приключение, присудить, призвание, присмотреть, приспособить, прерогатива, преамбула, препятствие, препоны, прерия, презент, преимущество, преисподняя, прегрешения, пренебрегать, прекословить, препираться, престол, превратный, знак_препинания, пресловутый, прельстить, преследовать, преподаватель, преподнести, препроводить, преподобный, пресмыкаться, препарировать, прелюдия, премьера, престиж, президент, претензия, презумпция, превентивный, прелат, превалировать, президиум, претендент, преферанс, прецедент, препарат, преодолеть'
-txt = """
-прибывать(приезжать) - пребывать(находиться);
-призреть(приютить,позаботиться) - презреть(пренебречь);
-притворить(закрыть) - претворить(воплотить);
-приклонить(наклонить) - преклонить(выразить_уважение,вызывающий_уважение);
-придать(добавить) - предать(предаться,_выдать);
-приходящий(являющийся) -  преходящий(временный);
-притерпеться(привыкнуть) -  претерпеть(пережить);
-приемник(радио) - преемник(ученик);
-приставить(поставить_к_чему-либо) - преставиться(умереть);
-привратник(сторож) - превратности (неприятности);
-приложить(положить_вплотную) - непреложный(незыблемый,_нерушимый);
-придел(пристройка_в_церкви) - предел(граница);""".split(';')
-
-
-
-
-wr_words = []
-stop = False
-did_t = -2
-cor_t = 0
-NOWWORD = 'лалалалала'
-pror_words = []
-pror_words_new = []
-
-
-for i in txt:
-	a = i.replace('-', '')
-	a = a.split()
-	try:
-		wr_words.append(a[0])
-		wr_words.append(a[1])
-	except:
-		pass
-line1 = line1.replace(',', '')
-b = line1.split()
-for i in b:
-	wr_words.append(i)
-words = []
-words7 = []
-
-def send_task7():
-	global words7
-	ans = words7[0]
-	del words7[0]
-	return ans
-
-async def do_task7():
-	global words7
-	global ex7
-	shuffle(ex7)
-	words7 = ex7
-
-
-def send_task_pror7():
-	global pror_words
-	k = randint(0, len(pror_words) - 1)
-	ans = pror_words[k]
-	del pror_words[k]
-	return ans
-
-
-
-def send_task():
-	global words
-	ans = words[0]
-	del words[0]
-	return ans
-
-def send_task_pror():
-	global pror_words
-	k = randint(0, len(pror_words) - 1)
-	ans = pror_words[k]
-	del pror_words[k]
-	return ans
-
-
-async def do_task():
-	global words
-	global wr_words
-	shuffle(wr_words)
-	words = wr_words
-
-
-
-@bot.on.message(func=lambda message: message.text.lower() == 'меню' or message.text.lower() == '[club187730402|@botaiege]')
-async def hi_handler(message: Message):
-	if message.text.lower() == 'меню':
-		users_info = await bot.api.users.get(message.from_id)
-		await message.answer(message='{}, выбери раздел?'.format(users_info[0].first_name), keyboard=menu_kb)
-		await bot.state_dispenser.set(message.peer_id, menu.MENU_RUS)
-	elif message.text.lower() == '[club187730402|@darowanoga]':
-		await message.answer(message='Отъебись'.format(users_info[0].first_name))
-
-
-
-
-
-
-@bot.on.message(state=menu.MENU_RUS)
-async def hi_handler(message: Message):
-	users_info = await bot.api.users.get(message.from_id)
-	await message.answer(message='Выбери задание (зеленые готовы)', keyboard=bot_kb)
-	await bot.state_dispenser.delete(message.peer_id)
-	await bot.state_dispenser.set(message.peer_id, botat.BOT_RUS)
-
-
-
-
-
 tasks_kb = (
 	Keyboard(one_time=True, inline=False)
 	.add(Text("И"), color=KeyboardButtonColor.POSITIVE)
@@ -316,33 +53,104 @@ tasks_kb = (
 	.get_json()
 )
 
+end_kb = (
+	Keyboard(one_time=False, inline=True)
+	.add(Text("МЕНЮ"), color=KeyboardButtonColor.PRIMARY)
+	.get_json()
+)
+
+async def newState(peer_id, obj):
+	global busy
+	await bot.state_dispenser.set(peer_id, obj)
+	busy = True
+
+async def delState(peer_id):
+	global busy
+	await bot.state_dispenser.delete(peer_id)
+	busy = False
+
+def check_orph10(s):
+	if s.islower():
+		return s[:2] + '_' + s[3:]
+	else:
+		for i in s:
+			if i.isupper():
+				return s[:s.index(i)] + '_' + s[s.index(i) + 1:]
+
+def get_ex10():
+	with open(r'C:\Users\ПК\Downloads\ex10.txt') as file:
+		ans = [x.strip() for x in file.readline().split(',')]
+		for i in file.readlines():
+			inp = [x.strip() for x in i.split('-')]
+			ans.append(inp[0])
+			ans.append(inp[1])
+	return ans
 
 
-@bot.on.message(state = botat.BOT_RUS)
+
+def shuf(ll):  
+	shuffle(ll)
+	return ll
+
+
+def get_word(ll):
+	ans = ll[0]
+	del ll[0]
+	return ans, ll
+
+
+class STATE_EX(BaseStateGroup):
+	STATE_EX_10 = 10
+	STATE_2 = 2
+
+class STATE_MENU(BaseStateGroup):
+	BOT_RUS = 0
+	BOT_TASK = 1
+
+
+
+
+@bot.on.private_message(func=lambda message: busy == False and message.text.lower() == 'меню' or message.text.lower() == '[club187730402|@botaiege]')
+async def hi_handler(message: Message):
+	if message.text.lower() == 'меню':
+		users_info = await bot.api.users.get(message.from_id)
+		await message.answer(message='{}, выбери раздел?'.format(users_info[0].first_name), keyboard=menu_kb)
+		await bot.state_dispenser.set(message.peer_id, STATE_MENU.BOT_RUS)
+	elif message.text.lower() == '[club187730402|@darowanoga]':
+		await message.answer(message='Отъебись')
+
+
+
+
+@bot.on.private_message(state=STATE_MENU.BOT_RUS)
+async def hi_handler(message: Message):
+	await message.answer(message='Выбери задание (зеленые готовы)', keyboard=bot_kb)
+	await bot.state_dispenser.set(message.peer_id, STATE_MENU.BOT_TASK)
+
+
+
+
+
+@bot.on.private_message(state = STATE_MENU.BOT_TASK)
 async def hi_handler(message: Message):
 	global did_t
 	global cor_t
-	global NOWWORD
-	global pror_words
-	global pror_words_new
+	global new_words
 	if message.text == '[club187730402|@botaiege] 10 ЗАДАНИЕ' or message.text == '10 ЗАДАНИЕ':
 		pror_words = []
 		pror_words_new = []
-		did_t = -1
+		did_t = -2
 		cor_t = 0
-		await message.answer(message='Начнем:')
-		await do_task()
-		NOWWORD = send_task()
-		new_i = NOWWORD[:2] + '_' + NOWWORD[3:]
-		await message.answer(message='Слово: ' + new_i, keyboard=tasks_kb)
-		await message.answer(message='----------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_TASKS)
+		words = get_ex10()
+		new_words = shuf(words)
+		await message.answer(message='Начнем:\n-----------------------------------------------')
+		await do_ex10(message)
 	elif message.text == '[club187730402|@botaiege] 7 ЗАДАНИЕ' or message.text == '7 ЗАДАНИЕ':
 		pror_words = []
 		pror_words_new = []
-		did_t = -1
+		did_t = -2
 		cor_t = 0
-		await message.answer(message='Начнем:')
+		await message.answer(message='Начнем:\n-----------------------------------------------')
 		await do_task7()
 		NOWWORD = send_task7()
 		new_i = NOWWORD[:-2] + '__'
@@ -355,134 +163,47 @@ async def hi_handler(message: Message):
 
 
 
-@bot.on.message(state = botat.BOT_TASKS)
-async def hi_handler(message: Message):
+
+@bot.on.private_message(state=STATE_EX.STATE_EX_10)
+async def do_ex10(message: Message):
+	global check_word
+	global busy
+	global new_words
+	global old_message
 	global did_t
 	global cor_t
-	global NOWWORD
-	global stop
-	global pror_words
-	new_word = NOWWORD
 	did_t += 1
-	if message.text.lower() == new_word[2] or message.text.lower() == '[club187730402|@botaiege] ' + new_word[2]:
-		cor_t += 1
-		await message.answer(message='✅ Верно, ' + new_word[:2] + new_word[2].upper() + new_word[3:])
-		await message.answer(message='----------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_TASKS)
-	elif message.text.lower() == '[club187730402|@botaiege] стоп' or message.text.lower() =='стоп':
-		await message.answer(message='Результат: ' + str(cor_t) + '/' + str(did_t))
-		if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота...')
-		elif did_t - cor_t == 0: await message.answer(message='Минимум 92 будет')
-		elif did_t - cor_t < 3: await message.answer(message='Заебись, конечно, но, чел, егэ через 0 дней.....')
-		else:  await message.answer(message='Чел, проспись а..............')
-		await bot.state_dispenser.delete(message.peer_id)
-		stop = True
-	elif message.text.lower() == '[club187730402|@botaiege] проработка' or message.text.lower() =='проработка':
-		NOWWORD = send_task_pror()
-		new_i = NOWWORD[:2] + '_' + NOWWORD[3:]
-		await message.answer(message='Слово: ' + new_i, keyboard=tasks_kb)
-		await message.answer(message='---------------------------------')
-		await bot.state_dispenser.delete(message.peer_id)
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_PRORAB)
-		stop = True
+	if (message.text == '[club187730402|@botaiege] 10 ЗАДАНИЕ' or message.text == '10 ЗАДАНИЕ') and busy == False:
+		get_word_ans, new_nums = get_word(new_words) 
+		await message.answer(message=check_orph10(get_word_ans))
+		check_word = get_word_ans
+		await newState(message.peer_id, STATE_EX.STATE_EX_10)
+		old_message = message.id
 	else:
-		pror_words.append(new_word)
-		await message.answer(message='❌ Неверно, '.upper() + new_word[:2] + new_word[2].upper() + new_word[3:])
-		await message.answer(message='----------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_TASKS)
-	if stop == False:
-		NOWWORD = send_task()
-		new_i = NOWWORD[:2] + '_' + NOWWORD[3:]
-		await message.answer(message='Слово: ' + new_i, keyboard=tasks_kb)
-	else:
-		stop = False
+		if message.text.lower() == '[club187730402|@botaiege] стоп' or message.text.lower() =='стоп' or len(new_words) == 0:
+			await delState(message.peer_id)
+			await message.answer(message='Результат: ' + str(cor_t) + '/' + str(did_t))
+			if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота...')
+			elif did_t - cor_t == 0: await message.answer(message='Минимум 92 будет')
+			elif did_t - cor_t < 3: await message.answer(message='Заебись, конечно, но, чел, егэ через 0 дней.....')
+			else:  await message.answer(message='Чел, проспись а..............')
+		else:
+			get_word_ans, new_words = get_word(new_words)
+			cord = check_orph10(check_word).index('_')
+			if message.text.lower() == check_word[cord].lower() or message.text.lower() == '[club187730402|@botaiege] ' + check_word[cord].lower():
+				cor_t += 1
+				await message.answer(message='✅ Верно, ' + check_word[:cord] + check_word[cord].upper() + check_word[cord+1:] + 
+					'\n-----------------------------------------------\n' + check_orph10(get_word_ans))
+				#await bot.api.messages.delete(message_id=old_message)
+			else:
+				await message.answer(message='❌ Неверно, '.upper() + check_word[:cord] + check_word[cord].upper() + check_word[cord+1:] + 
+					'\n-----------------------------------------------\n' + check_orph10(get_word_ans))
+			check_word = get_word_ans 
+			await newState(message.peer_id, STATE_EX.STATE_EX_10)
 
-
-
-@bot.on.message(state=botat.BOT_PRORAB)
+@bot.on.private_message(func=lambda message: message.text.lower() != 'меню' and message.text.lower() != '[club187730402|@botaiege]')
 async def hi_handler(message: Message):
-	global NOWWORD
-	global stop
-	global pror_words
-	global pror_words_new
-	new_word = NOWWORD
-	if len(pror_words) < 1:
-		await message.answer(message='Удачи на экзамене!')
-		await bot.state_dispenser.delete(message.peer_id)
-		stop = True
-	if message.text.lower() == new_word[2]:
-		await message.answer(message='✅ Верно, ' + new_word[:2] + new_word[2].upper() + new_word[3:])
-		await message.answer(message='---------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_TASKS)
-	elif message.text.lower() == '[club187730402|@botaiege] стоп' or message.text.lower() =='стоп':
-		await message.answer(message='Удачи на экзамене!')
-		await bot.state_dispenser.delete(message.peer_id)
-		stop = True
-	elif message.text.lower() == '[club187730402|@botaiege] проработка' or message.text.lower() =='проработка':
-		pror_words = pror_words_new
-		NOWWORD = send_task_pror()
-		new_i = NOWWORD[:2] + '_' + NOWWORD[3:]
-		await message.answer(message='Слово: ' + new_i, keyboard=tasks_kb)
-		await message.answer(message='----------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_PRORAB)
-	else:
-		pror_words_new.append(new_word)
-		await message.answer(message='❌ Неверно, '.upper() + new_word[:2] + new_word[2].upper() + new_word[3:])
-		await message.answer(message='----------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_TASKS)
-
-	if stop == False:
-		NOWWORD = send_task_pror()
-		new_i = NOWWORD[:2] + '_' + NOWWORD[3:]
-		await message.answer(message='Слово: ' + new_i, keyboard=tasks_kb)
-	else:
-		stop = False
-
-
-
-
-@bot.on.message(state = botat.BOT_TASKS7)
-async def hi_handler(message: Message):
-	global did_t
-	global cor_t
-	global NOWWORD
-	global stop
-	global pror_words
-	new_word = NOWWORD
-	did_t += 1
-	if message.text.lower() == new_word[-2:] or message.text.lower() == '[club187730402|@botaiege] ' + new_word[-2:]:
-		cor_t += 1
-		await message.answer(message='✅ Верно, ' + new_word[:-2] + new_word[-2:].upper())
-		await message.answer(message='----------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_TASKS)
-	elif message.text.lower() == '[club187730402|@botaiege] стоп' or message.text.lower() =='стоп':
-		await message.answer(message='Результат: ' + str(cor_t) + '/' + str(did_t))
-		if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота...')
-		elif did_t - cor_t == 0: await message.answer(message='Минимум 92 будет')
-		elif did_t - cor_t < 3: await message.answer(message='Заебись, конечно, но, чел, егэ через 0 дней.....')
-		else:  await message.answer(message='Чел, проспись а..............')
-		await bot.state_dispenser.delete(message.peer_id)
-		stop = True
-	elif message.text.lower() == '[club187730402|@botaiege] проработка' or message.text.lower() =='проработка':
-		NOWWORD = send_task_pror()
-		new_i = NOWWORD[:-2] + '__'
-		await message.answer(message='Слово: ' + new_i)
-		await message.answer(message='---------------------------------')
-		await bot.state_dispenser.delete(message.peer_id)
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_PRORAB)
-		stop = True
-	else:
-		pror_words.append(new_word)
-		await message.answer(message='❌ Неверно, '.upper() + new_word[:-2] + new_word[-2:].upper())
-		await message.answer(message='----------------------------------')
-		await bot.state_dispenser.set(message.peer_id, botat.BOT_TASKS)
-	if stop == False:
-		NOWWORD = send_task()
-		new_i = NOWWORD[:-2] + '__'
-		await message.answer(message='Слово: ' + new_i)
-	else:
-		stop = False
-
-
+	users_info = await bot.api.users.get(message.from_id)
+	await message.answer(message='{}, нажми кнопку меню'.format(users_info[0].first_name), keyboard=end_kb)
 
 bot.run_forever()
