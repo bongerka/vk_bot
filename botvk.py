@@ -78,7 +78,7 @@ def check_orph10(s):
 				return s[:s.index(i)] + '_' + s[s.index(i) + 1:]
 
 def get_ex10():
-	with open(r'bongerka\bot3\ex10.txt') as file:
+	with open(r'\ex10.txt') as file:
 		ans = [x.strip() for x in file.readline().split(',')]
 		for i in file.readlines():
 			inp = [x.strip() for x in i.split('-')]
