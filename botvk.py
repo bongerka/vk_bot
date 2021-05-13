@@ -1,5 +1,5 @@
 from random import shuffle, randint 
-from pathlib import Path
+from pathlib import Path	
 import asyncio											# python C:\Users\ПК\Downloads\sdvb.py
 from vkbottle_types import BaseStateGroup
 from vkbottle.bot import Bot, Message
@@ -10,10 +10,12 @@ from vkbottle import (
 	)
 
 
+
+dir = Path('botvk.py').parent
 token = '1eefd03cabef397c236c72b85a734fe05d3b73171a6dd9a01f4beb7c5c5aa6a08a814bbdbdcea81a23012'
 bot = Bot(token=token)
 chat_id = 2*10**9+1
-dir = Path('botvk.py').parent
+
 
 
 @bot.loop_wrapper.interval(seconds=36000)
@@ -27,6 +29,8 @@ check_word = ''
 busy = False
 did_t = -2
 cor_t = 0
+old_messages = []
+
 
 bot_kb = (
 	Keyboard(one_time=False, inline=True)
@@ -45,12 +49,14 @@ menu_kb = (
 )
 
 tasks_kb = (
-	Keyboard(one_time=True, inline=False)
+	Keyboard(one_time=False, inline=False)
 	.add(Text("И"), color=KeyboardButtonColor.POSITIVE)
 	.add(Text("Е"), color=KeyboardButtonColor.POSITIVE)
 	.row()
 	.add(Text("СТОП"), color=KeyboardButtonColor.NEGATIVE)
 	.add(Text("ПРОРАБОТКА"), color=KeyboardButtonColor.PRIMARY)
+	.row()
+	.add(Text("МЕНЮ"), color=KeyboardButtonColor.SECONDARY)
 	.get_json()
 )
 
@@ -79,7 +85,7 @@ def check_orph10(s):
 				return s[:s.index(i)] + '_' + s[s.index(i) + 1:]
 
 def get_ex10():
-	with open(dir / "ex10.txt") as file:
+	with open(dir / "ex10.txt") as file:  #dir / "ex10.txt"
 		ans = [x.strip() for x in file.readline().split(',')]
 		for i in file.readlines():
 			inp = [x.strip() for x in i.split('-')]
@@ -142,16 +148,16 @@ async def hi_handler(message: Message):
 		pror_words_new = []
 		did_t = -2
 		cor_t = 0
-		words = get_ex10()
+		words = get_ex10() 						#
 		new_words = shuf(words)
-		await message.answer(message='Начнем:\n-----------------------------------------------')
+		await message.answer(message='Начнем:\n----------------------------------------')
 		await do_ex10(message)
 	elif message.text == '[club187730402|@botaiege] 7 ЗАДАНИЕ' or message.text == '7 ЗАДАНИЕ':
 		pror_words = []
 		pror_words_new = []
 		did_t = -2
 		cor_t = 0
-		await message.answer(message='Начнем:\n-----------------------------------------------')
+		await message.answer(message='Начнем:\n----------------------------------------')
 		await do_task7()
 		NOWWORD = send_task7()
 		new_i = NOWWORD[:-2] + '__'
@@ -170,37 +176,41 @@ async def do_ex10(message: Message):
 	global check_word
 	global busy
 	global new_words
-	global old_message
 	global did_t
 	global cor_t
 	did_t += 1
 	if (message.text == '[club187730402|@botaiege] 10 ЗАДАНИЕ' or message.text == '10 ЗАДАНИЕ') and busy == False:
 		get_word_ans, new_nums = get_word(new_words) 
-		await message.answer(message=check_orph10(get_word_ans))
+		await message.answer(message=check_orph10(get_word_ans), keyboard=tasks_kb)
 		check_word = get_word_ans
 		await newState(message.peer_id, STATE_EX.STATE_EX_10)
-		old_message = message.id
 	else:
 		if message.text.lower() == '[club187730402|@botaiege] стоп' or message.text.lower() =='стоп' or len(new_words) == 0:
 			await delState(message.peer_id)
-			await message.answer(message='Результат: ' + str(cor_t) + '/' + str(did_t))
+			users_info = await bot.api.users.get(message.from_id)
+			await message.answer(message=f'{users_info[0].first_name}, твой результат: ' + str(cor_t) + '/' + str(did_t))
 			if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота...')
 			elif did_t - cor_t == 0: await message.answer(message='Минимум 92 будет')
 			elif did_t - cor_t < 3: await message.answer(message='Заебись, конечно, но, чел, егэ через 0 дней.....')
 			else:  await message.answer(message='Чел, проспись а..............')
+		elif message.text.lower() == '[club187730402|@botaiege] проработка' or message.text.lower() =='проработка':
+			await message.answer(message='бигбой не успел сделать')
+			await delState(message.peer_id)
+			users_info = await bot.api.users.get(message.from_id)
+			await message.answer(message=f'{users_info[0].first_name}, твой результат: ' + str(cor_t) + '/' + str(did_t))
 		else:
 			get_word_ans, new_words = get_word(new_words)
 			cord = check_orph10(check_word).index('_')
 			if message.text.lower() == check_word[cord].lower() or message.text.lower() == '[club187730402|@botaiege] ' + check_word[cord].lower():
 				cor_t += 1
 				await message.answer(message='✅ Верно, ' + check_word[:cord] + check_word[cord].upper() + check_word[cord+1:] + 
-					'\n-----------------------------------------------\n' + check_orph10(get_word_ans))
-				#await bot.api.messages.delete(message_id=old_message)
+					'\n----------------------------------------\n' + check_orph10(get_word_ans), keyboard=tasks_kb)
 			else:
 				await message.answer(message='❌ Неверно, '.upper() + check_word[:cord] + check_word[cord].upper() + check_word[cord+1:] + 
-					'\n-----------------------------------------------\n' + check_orph10(get_word_ans))
+					'\n----------------------------------------\n' + check_orph10(get_word_ans), keyboard=tasks_kb)
 			check_word = get_word_ans 
 			await newState(message.peer_id, STATE_EX.STATE_EX_10)
+
 
 @bot.on.private_message(func=lambda message: message.text.lower() != 'меню' and message.text.lower() != '[club187730402|@botaiege]')
 async def hi_handler(message: Message):
