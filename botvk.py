@@ -1,4 +1,5 @@
-from random import shuffle, randint 	
+from random import shuffle, randint 
+from pathlib import Path
 import asyncio											# python C:\Users\ПК\Downloads\sdvb.py
 from vkbottle_types import BaseStateGroup
 from vkbottle.bot import Bot, Message
@@ -12,7 +13,7 @@ from vkbottle import (
 token = '1eefd03cabef397c236c72b85a734fe05d3b73171a6dd9a01f4beb7c5c5aa6a08a814bbdbdcea81a23012'
 bot = Bot(token=token)
 chat_id = 2*10**9+1
-
+dir = Path('botvk.py').parent
 
 
 @bot.loop_wrapper.interval(seconds=36000)
@@ -78,7 +79,7 @@ def check_orph10(s):
 				return s[:s.index(i)] + '_' + s[s.index(i) + 1:]
 
 def get_ex10():
-	with open(r'\ex10.txt') as file:
+	with open(dir / "ex10.txt") as file:
 		ans = [x.strip() for x in file.readline().split(',')]
 		for i in file.readlines():
 			inp = [x.strip() for x in i.split('-')]
