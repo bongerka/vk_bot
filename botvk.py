@@ -117,7 +117,7 @@ class STATE_MENU(BaseStateGroup):
 
 
 
-@bot.on.private_message(func=lambda message: busy == False and message.text.lower() == 'меню' or message.text.lower() == '[club187730402|@botaiege]')
+@bot.on.private_message(func=lambda message: message.text.lower() == 'меню' or message.text.lower() == '[club187730402|@botaiege]')
 async def hi_handler(message: Message):
 	if message.text.lower() == 'меню':
 		users_info = await bot.api.users.get(message.from_id)
