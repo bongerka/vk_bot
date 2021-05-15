@@ -20,7 +20,12 @@ chat_id = 2*10**9+1
 
 @bot.loop_wrapper.interval(seconds=18000)
 async def repeated_task():
-	await bot.api.messages.send(peer_id=chat_id, random_id=0, message='Пора ботать')
+	try:
+		for i in users.keys():
+			await bot.api.messages.send(peer_id=i, random_id=0, message='Пора ботать')
+	except:
+		await bot.api.messages.send(peer_id=chat_id, random_id=0, message='Пора ботать')
+		
 
 
 
@@ -281,65 +286,61 @@ async def do_ex10(message: Message):
 
 @bot.on.private_message(state=STATE_EX.STATE_EX_14)
 async def do_ex14(message: Message):
-	if message.peer_id == 194480728:
-		await message.answer(message='Мне передали, что вы полностью ознакомлены с этой темой!', keyboard=end_kb)
-		await delState(message.peer_id)
-	else:
-		try:
-			this_user = users.get(message.peer_id)
-			points = this_user.points
-			did_t = points[0]
-			cor_t = points[1]
-			did_t += 1
-			new_words = this_user.words
-			if this_user.busy == False:
-				get_word_ans, new_words = get_word(new_words) 
+	try:
+		this_user = users.get(message.peer_id)
+		points = this_user.points
+		did_t = points[0]
+		cor_t = points[1]
+		did_t += 1
+		new_words = this_user.words
+		if this_user.busy == False:
+			get_word_ans, new_words = get_word(new_words) 
+			this_user.words = new_words
+			this_user.check_word = get_word_ans
+			await newState(message.peer_id, STATE_EX.STATE_EX_14)
+			await message.answer(message='Начнем:\n----------------------------------------\n' + secret_word(get_word_ans), keyboard=this_user.keyboard)
+		else:
+			if message.text.lower() =='стоп' or len(new_words) == 0:
+				await delState(message.peer_id)
+				await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
+				if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота')
+				elif did_t - cor_t == 0: await message.answer(message='Думаю, тут минимум 92 балла в формате ЕГЭ')
+				elif did_t - cor_t < 3: await message.answer(message='Not bad')
+				else:  
+					if this_user.name == 'Илья': await message.answer(message='Даже не верится, что ты Илья 0_0')
+					else: await message.answer(message='Ты не Илья, тебе можно')
+			elif message.text.lower() =='проработка':
+				await message.answer(message='Бигбой не успел сделать')
+				await delState(message.peer_id)
+				await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t))
+			else:
+				check_word = this_user.check_word
+				get_word_ans, new_words = get_word(new_words)
 				this_user.words = new_words
+				cord_start, cord_end = getCords(check_word)
+				cord_end += cord_start
+				if message.text.lower() == check_word[cord_start:cord_end].lower():
+					cor_t += 1
+					if 'СЛИТНО' in check_word:
+						check_word = check_word.replace('СЛИТНО', '')
+					else:
+						check_word = check_word.replace('РАЗДЕЛЬНО', ' ')
+					await message.answer(message='✅ Верно, ' + check_word + 
+						'\n----------------------------------------\n' + secret_word(get_word_ans))
+				else:
+					if 'СЛИТНО' in check_word:
+						check_word = check_word.replace('СЛИТНО', '')
+					else:
+						check_word = check_word.replace('РАЗДЕЛЬНО', ' ')
+
+					await message.answer(message='❌ Неверно, '.upper() + check_word + 
+						'\n----------------------------------------\n' + secret_word(get_word_ans))
 				this_user.check_word = get_word_ans
 				await newState(message.peer_id, STATE_EX.STATE_EX_14)
-				await message.answer(message='Начнем:\n----------------------------------------\n' + secret_word(get_word_ans), keyboard=this_user.keyboard)
-			else:
-				if message.text.lower() =='стоп' or len(new_words) == 0:
-					await delState(message.peer_id)
-					await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
-					if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота')
-					elif did_t - cor_t == 0: await message.answer(message='Думаю, тут минимум 92 балла в формате ЕГЭ')
-					elif did_t - cor_t < 3: await message.answer(message='Not bad')
-					else:  
-						if this_user.name == 'Илья': await message.answer(message='Даже не верится, что ты Илья 0_0')
-						else: await message.answer(message='Ты не Илья, тебе можно')
-				elif message.text.lower() =='проработка':
-					await message.answer(message='Бигбой не успел сделать')
-					await delState(message.peer_id)
-					await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t))
-				else:
-					check_word = this_user.check_word
-					get_word_ans, new_words = get_word(new_words)
-					this_user.words = new_words
-					cord_start, cord_end = getCords(check_word)
-					cord_end += cord_start
-					if message.text.lower() == check_word[cord_start:cord_end].lower():
-						cor_t += 1
-						if 'СЛИТНО' in check_word:
-							check_word = check_word.replace('СЛИТНО', '')
-						else:
-							check_word = check_word.replace('РАЗДЕЛЬНО', ' ')
-						await message.answer(message='✅ Верно, ' + check_word + 
-							'\n----------------------------------------\n' + secret_word(get_word_ans))
-					else:
-						if 'СЛИТНО' in check_word:
-							check_word = check_word.replace('СЛИТНО', '')
-						else:
-							check_word = check_word.replace('РАЗДЕЛЬНО', ' ')
-
-						await message.answer(message='❌ Неверно, '.upper() + check_word + 
-							'\n----------------------------------------\n' + secret_word(get_word_ans))
-					this_user.check_word = get_word_ans
-					await newState(message.peer_id, STATE_EX.STATE_EX_14)
-			this_user.points = (did_t, cor_t)
-		except:
-			await message.answer(message='Возникли проблемы, все починим в скором времени')
-			await delState(message.peer_id)
+		this_user.points = (did_t, cor_t)
+	except:
+		await message.answer(message='Возникли проблемы, все починим в скором времени')
+		await delState(message.peer_id)
 
 
 
