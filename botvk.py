@@ -222,10 +222,10 @@ async def do_ex10(message: Message):
 			cord_end += cord_start
 			if message.text.lower() == check_word[cord_start:cord_end].lower():
 				cor_t += 1
-				await message.answer(message='✅ Верно, ' + check_word[:cord_start] + check_word[cord_start:cord_end].upper() + check_word[cord_end+1:] + 
+				await message.answer(message='✅ Верно, ' + check_word[:cord_start] + check_word[cord_start:cord_end].upper() + check_word[cord_end:] + 
 					'\n----------------------------------------\n' + check_orph10(get_word_ans), keyboard=tasks_kb)
 			else:
-				await message.answer(message='❌ Неверно, '.upper() + check_word[:cord_start] + check_word[cord_start:cord_end].upper() + check_word[cord_end+1:] + 
+				await message.answer(message='❌ Неверно, '.upper() + check_word[:cord_start] + check_word[cord_start:cord_end].upper() + check_word[cord_end:] + 
 					'\n----------------------------------------\n' + check_orph10(get_word_ans), keyboard=tasks_kb)
 			changeDict(users_check_word, message.peer_id, get_word_ans)
 			await newState(message.peer_id, STATE_EX.STATE_EX_7_10)
