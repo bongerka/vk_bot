@@ -1,5 +1,6 @@
 from random import shuffle, randint 
 from pathlib import Path	
+import sqlite3
 import asyncio											# python C:\Users\ПК\Downloads\botvk.py
 from vkbottle_types import BaseStateGroup
 from vkbottle.bot import Bot, Message
@@ -17,25 +18,28 @@ bot = Bot(token=token)
 chat_id = 2*10**9+1
 
 
+conn = sqlite3.connect(r"C:\Users\ПК\Downloads\vk_bd2.db")
+cursor = conn.cursor()
+cursor.execute('''CREATE TABLE IF NOT EXISTS vk_bd(
+				peer_id INTEGER NOT NULL, 
+				balance INTEGER NOT NULL)''')
+conn.commit()
 
-@bot.loop_wrapper.interval(seconds=18000)
+
+@bot.loop_wrapper.interval(seconds=86400)
 async def repeated_task():
-	try:
-		for i in users.keys():
-			await bot.api.messages.send(peer_id=i, random_id=0, message='Пора ботать')
-	except:
-		await bot.api.messages.send(peer_id=chat_id, random_id=0, message='Пора ботать')
-		
+	await bot.api.messages.send(peer_id=chat_id, random_id=0, message='Пора ботать')
 
 
 
 class user:
-	def __init__(self, name):
+	def __init__(self, name, surname):
 		self.busy = False
 		self.words = []
 		self.check_word = ''
 		self.points = (-2, 0)
 		self.name = name
+		self.surname = surname
 
 	def _change_kb(self, *args):
 		listOfButtons = []
@@ -73,18 +77,18 @@ users = dict()
 
 bot_kb = (
 	Keyboard(one_time=False, inline=True)
+	.add(Text("ПАРОНИМЫ"), color=KeyboardButtonColor.PRIMARY)
 	.add(Text("7 ЗАДАНИЕ"), color=KeyboardButtonColor.POSITIVE)
-	.add(Text("10 ЗАДАНИЕ"), color=KeyboardButtonColor.POSITIVE)
 	.row()
+	.add(Text("10 ЗАДАНИЕ"), color=KeyboardButtonColor.POSITIVE)
 	.add(Text("14 ЗАДАНИЕ"), color=KeyboardButtonColor.POSITIVE)
-	.add(Text("15 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
 ).get_json()
 
 menu_kb = (
 	Keyboard(one_time=True, inline=False)
 	.add(Text("РУССКИЙ ЯЗЫК"), color=KeyboardButtonColor.POSITIVE)
 	.row()
-	.add(Text("ДОБАВЛЕНИЕ СЛОВ"), color=KeyboardButtonColor.PRIMARY)
+	.add(Text("РЕЙТИНГ"), color=KeyboardButtonColor.PRIMARY)
 ).get_json()
 
 
@@ -107,7 +111,7 @@ class STATE_MENU(BaseStateGroup):
 	BOT_TASK = 1
 
 
-async def newUser(peer_id, name):
+async def newUser(peer_id, name, surname):
 	if users.get(peer_id) != None:
 		users.pop(peer_id)
 	users.setdefault(peer_id, user(name))
@@ -120,6 +124,22 @@ async def delState(peer_id):
 	await bot.state_dispenser.delete(peer_id)
 	users.get(peer_id).busy = False
 
+
+def getRate():
+	ll = []
+	for i in users.keys():
+		cursor.execute("""SELECT balance FROM vk_bd WHERE peer_id = (?)""", (i,))
+		ll.append([str(users.get(i).name) + ' ' + users.get(i).surname, cursor.fetchone()[0]])
+	return ll
+
+def NewUser(peer_id):
+	cursor.execute("""
+					SELECT peer_id FROM vk_bd WHERE peer_id = (?)
+					""", (peer_id,))
+	if cursor.fetchone() is None:
+		return True
+	else:
+		return False
 
 def secret_word(s):
 	if s.islower():
@@ -134,6 +154,16 @@ def secret_word(s):
 			else:
 				ans += i
 		return ans
+
+def addBal(amount, peer_id):
+	sumToAdd = amount
+	cursor.execute("""SELECT balance FROM vk_bd WHERE peer_id = (?)""", (peer_id))
+	oldBalance = cursor.fetchone()[0]
+	cursor.execute("""UPDATE vk_bd 
+					  SET balance = (?)
+					  WHERE peer_id = (?)
+					""", (oldBalance + sumToAdd, peer_id))
+	conn.commit()
 
 
 def getCords(s):
@@ -170,8 +200,14 @@ def get_word(ll):
 
 @bot.on.private_message(func=lambda message: message.text.lower() == 'меню')
 async def hi_handler(message: Message):
+	if NewUser(message.from_id):
+		cursor.execute("""INSERT INTO vk_bd
+						  (peer_id, balance)
+						  VALUES (?, ?)
+							""", (message.from_id, 0))
+		conn.commit()
 	users_info = await bot.api.users.get(message.from_id)
-	await newUser(message.peer_id, users_info[0].first_name)
+	await newUser(message.peer_id, users_info[0].first_name, users_info[0].last_name)
 	if message.text.lower() == 'меню':
 		await message.answer(message=f'{users_info[0].first_name}, выбери раздел?', keyboard=menu_kb)
 		await bot.state_dispenser.set(message.peer_id, STATE_MENU.BOT_RUS)
@@ -182,10 +218,18 @@ async def hi_handler(message: Message):
 @bot.on.private_message(state=STATE_MENU.BOT_RUS)
 async def hi_handler(message: Message):
 	if message.text.lower() == 'русский язык':
-		await message.answer(message='Выбери задание (зеленые готовы)', keyboard=bot_kb)
+		await message.answer(message='Выбери задание', keyboard=bot_kb)
 		await bot.state_dispenser.set(message.peer_id, STATE_MENU.BOT_TASK)
+	elif message.text.lower() == 'рейтинг':
+		nes_list = getRate()
+		nes_list.sort(key=lambda x: x[1])
+		str_bals = ''
+		for i in range(len(nes_list)):
+			str_bals += str(i+1) + '. ' + nes_list[i][0] + f' ({nes_list[i][1]})\n'
+		await message.answer(message=str_bals, keyboard=end_kb)
+		delState(message.peer_id)
 	else:
-		await message.answer(message='Еще не готово :(', keyboard=menu_kb)
+		await message.answer(message='Такого раздела нет!', keyboard=menu_kb)
 		await bot.state_dispenser.set(message.peer_id, STATE_MENU.BOT_RUS)
 
 
@@ -213,7 +257,7 @@ async def hi_handler(message: Message):
 		this_user._change_kb('СЛИТНО', 'РАЗДЕЛЬНО')
 		await do_ex14(message)
 	else:
-		await message.answer(message='Еще не готово, выберите другое задание')
+		await message.answer(message='Такого задания нет!')
 		await bot.state_dispenser.set(message.peer_id, STATE_MENU.BOT_TASK)
 
 
@@ -251,6 +295,8 @@ async def do_ex10(message: Message):
 			await message.answer(message='Начнем:\n----------------------------------------\n' + secret_word(get_word_ans), keyboard=this_user.keyboard)
 		else:
 			if message.text.lower() =='стоп' or len(new_words) == 0:
+				addBal(cor_t, message.peer_id)
+				await message.answer(message=change_balance_text.format(oldBalance + sumToAdd), keyboard=menu_kb)
 				await delState(message.peer_id)
 				await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
 				if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота')
@@ -259,21 +305,32 @@ async def do_ex10(message: Message):
 				else:  
 					if this_user.name == 'Илья': await message.answer(message='Даже не верится, что ты Илья 0_0')
 					else: await message.answer(message='Ты не Илья, тебе можно')
-			elif message.text.lower() =='проработка':
-				await message.answer(message='Бигбой не успел сделать')
-				await delState(message.peer_id)
-				await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t))
 			else:
 				check_word = this_user.check_word
 				get_word_ans, new_words = get_word(new_words)
 				this_user.words = new_words
 				cord_start, cord_end = getCords(check_word)
 				cord_end += cord_start
-				if message.text.lower() == check_word[cord_start:cord_end].lower():
-					cor_t += 1
-					await message.answer(message='✅ Верно, ' + check_word[:cord_start] + check_word[cord_start:cord_end].upper() + check_word[cord_end:] + 
-						'\n----------------------------------------\n' + secret_word(get_word_ans))
+				if message.text.lower() =='проработка':
+					addBal(cor_t, message.peer_id)
+					did_t -= 1
+					await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t))
+					new_words = new_words[cor_t - did_t:]
+					shuffle(new_words)
+					get_word_ans, new_words = get_word(new_words)
+					this_user.words = new_words
+					cord_start, cord_end = getCords(check_word)
+					cord_end += cord_start
+					this_user.points = (-2, 0)
+					await message.answer(message='Повторим неправильно сделанные слова\n\n' + check_word[:cord_start] + 
+							check_word[cord_start:cord_end].upper() + check_word[cord_end:] + 
+							'\n----------------------------------------\n' + secret_word(get_word_ans))
+				elif message.text.lower() == check_word[cord_start:cord_end].lower():
+						cor_t += 1
+						await message.answer(message='✅ Верно, ' + check_word[:cord_start] + check_word[cord_start:cord_end].upper() + check_word[cord_end:] + 
+							'\n----------------------------------------\n' + secret_word(get_word_ans))
 				else:
+					this_user.words.append(get_word_ans)
 					await message.answer(message='❌ Неверно, '.upper() + check_word[:cord_start] + check_word[cord_start:cord_end].upper() + check_word[cord_end:] + 
 						'\n----------------------------------------\n' + secret_word(get_word_ans))
 				this_user.check_word = get_word_ans
@@ -319,20 +376,27 @@ async def do_ex14(message: Message):
 				this_user.words = new_words
 				cord_start, cord_end = getCords(check_word)
 				cord_end += cord_start
-				if message.text.lower() == check_word[cord_start:cord_end].lower():
+				if 'СЛИТНО' in check_word:
+					check_word = check_word.replace('СЛИТНО', '')
+				else:
+					check_word = check_word.replace('РАЗДЕЛЬНО', ' ')
+				if message.text.lower() =='проработка':
+					did_t -= 1
+					await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t))
+					new_words = new_words[cor_t - did_t:]
+					shuffle(new_words)
+					get_word_ans, new_words = get_word(new_words)
+					this_user.words = new_words
+					cord_start, cord_end = getCords(check_word)
+					cord_end += cord_start
+					await message.answer(message='Повторим неправильно сделанные слова\n\n' + + check_word + 
+						'\n----------------------------------------\n' + secret_word(get_word_ans))
+				elif message.text.lower() == check_word[cord_start:cord_end].lower():
 					cor_t += 1
-					if 'СЛИТНО' in check_word:
-						check_word = check_word.replace('СЛИТНО', '')
-					else:
-						check_word = check_word.replace('РАЗДЕЛЬНО', ' ')
 					await message.answer(message='✅ Верно, ' + check_word + 
 						'\n----------------------------------------\n' + secret_word(get_word_ans))
 				else:
-					if 'СЛИТНО' in check_word:
-						check_word = check_word.replace('СЛИТНО', '')
-					else:
-						check_word = check_word.replace('РАЗДЕЛЬНО', ' ')
-
+					this_user.words.append(get_word_ans)
 					await message.answer(message='❌ Неверно, '.upper() + check_word + 
 						'\n----------------------------------------\n' + secret_word(get_word_ans))
 				this_user.check_word = get_word_ans
