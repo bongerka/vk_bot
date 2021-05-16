@@ -12,7 +12,7 @@ from vkbottle import (
 
 
 
-dir = Path(r'C:\Users\ПК\Downloads\botvk.py').parent # r'C:\Users\ПК\Downloads\botvk.py' \\\\ 'botvk.py'
+dir = Path('botvk.py').parent # r'C:\Users\ПК\Downloads\botvk.py' \\\\ 'botvk.py'
 token = '1eefd03cabef397c236c72b85a734fe05d3b73171a6dd9a01f4beb7c5c5aa6a08a814bbdbdcea81a23012'
 bot = Bot(token=token)
 chat_id = 2*10**9+1
