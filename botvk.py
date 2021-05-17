@@ -549,7 +549,7 @@ async def do_exPar(message: Message):
 						cor_t += 1
 						await message.answer(message='✅ Верно' + '\n-----------------------------------\n' + get_word_ans, keyboard=this_user.keyboard)
 				else:
-					await message.answer(message='❌ Неверно'.upper() + '\n-----------------------------------\n' + get_word_ans, keyboard=this_user.keyboard)
+					await message.answer(message='❌ Неверно, '.upper() + check_word + '\n-----------------------------------\n' + get_word_ans, keyboard=this_user.keyboard)
 				this_user.check_word = par_word
 				await newState(message.peer_id, STATE_EX.STATE_EX_PAR)
 		this_user.points = (did_t, cor_t)
