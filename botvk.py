@@ -37,7 +37,7 @@ class user:
 		self.busy = False
 		self.words = []
 		self.check_word = ''
-		self.points = (-2, 0)
+		self.points = (-1, 0)
 		self.name = name
 		self.surname = surname
 
@@ -351,6 +351,7 @@ async def do_ex10(message: Message):
 			await message.answer(message='Начнем:\n-----------------------------------\n' + secret_word(get_word_ans), keyboard=this_user.keyboard)
 		else:
 			if message.text.lower() =='стоп':
+				did_t -= 1
 				addBal(2*cor_t-did_t, message.peer_id)
 				await delState(message.peer_id)
 				await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
@@ -424,6 +425,7 @@ async def do_ex14(message: Message):
 			await message.answer(message='Начнем:\n-----------------------------------\n' + secret_word(get_word_ans), keyboard=this_user.keyboard)
 		else:
 			if message.text.lower() =='стоп':
+				did_t -= 1
 				addBal(2*cor_t-did_t, message.peer_id)
 				await delState(message.peer_id)
 				await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
@@ -518,6 +520,7 @@ async def do_exPar(message: Message):
 			await message.answer(message='Начнем:\n-----------------------------------\n' + get_word_ans, keyboard=this_user.keyboard)
 		else:
 			if message.text.lower() =='стоп':
+				did_t -= 1
 				addBal(2*cor_t-did_t, message.peer_id)
 				await delState(message.peer_id)
 				await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
