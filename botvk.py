@@ -1,7 +1,7 @@
 from random import shuffle, randint 
 from pathlib import Path	
 import sqlite3
-import asyncio											# python C:\Users\ПК\Downloads\botvk.py
+import asyncio									
 from vkbottle_types import BaseStateGroup
 from vkbottle.bot import Bot, Message
 from vkbottle import (
@@ -12,7 +12,7 @@ from vkbottle import (
 
 
 
-dir = Path('botvk.py').parent # r'C:\Users\ПК\Downloads\botvk.py' \\\\ 'botvk.py'
+dir = Path('botvk.py').parent
 token = '1eefd03cabef397c236c72b85a734fe05d3b73171a6dd9a01f4beb7c5c5aa6a08a814bbdbdcea81a23012'
 bot = Bot(token=token)
 chat_id = 2*10**9+1
@@ -535,7 +535,7 @@ async def do_exPar(message: Message):
 					cor_t += 1
 					await message.answer(message='✅ Верно')
 				else:
-					await message.answer(message='❌ Неверно')
+					await message.answer(message='❌ Неверно, ' + check_word)
 				await message.answer(message=f'{this_user.name}, слова закончились. Твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
 			else:
 				check_word = this_user.check_word
