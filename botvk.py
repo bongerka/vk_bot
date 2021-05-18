@@ -208,7 +208,7 @@ def get_ex_par(href):
 				dicts = [x.strip() for x in para[1].split(':')]
 				ans.append(titles)
 				ans.append(dicts)
-			ansss.append(ans)
+				ansss.append(ans)
 		return ansss
 
 
