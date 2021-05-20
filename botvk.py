@@ -23,6 +23,11 @@ cursor = conn.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS vk_bd(
 				peer_id INTEGER NOT NULL, 
 				balance INTEGER NOT NULL)''')
+conn = sqlite3.connect(r"C:\Users\ПК\Downloads\vk_bd2.db")
+cursor = conn.cursor()
+cursor.execute('''CREATE TABLE IF NOT EXISTS vk_bd(
+				peer_id INTEGER NOT NULL, 
+				balance INTEGER NOT NULL)''')
 conn.commit()
 
 
@@ -90,6 +95,8 @@ bot_kb = (
 	.row()
 	.add(Text("10 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
 	.add(Text("14 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
+	.row()
+	.add(Text("15 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
 ).get_json()
 
 menu_kb = (
@@ -294,6 +301,11 @@ async def hi_handler(message: Message):
 		words = get_ex("ex10.txt")
 		this_user.words = shuf(words)
 		this_user._change_kb(['И', 'Е'])
+		await do_ex10(message)
+	elif message.text.lower() == '15 задание':
+		words = get_ex("ex15.txt")
+		this_user.words = shuf(words)
+		this_user._change_kb(['Н', 'НН'])
 		await do_ex10(message)
 	elif message.text.lower() == '7 задание':
 		await message.answer(message='Выберите форму слов', 
