@@ -97,6 +97,7 @@ bot_kb = (
 	.add(Text("14 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
 	.row()
 	.add(Text("15 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
+	.add(Text("26 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
 ).get_json()
 
 menu_kb = (
@@ -119,6 +120,7 @@ class STATE_EX(BaseStateGroup):
 	STATE_EX_7 = 7
 	STATE_EX_14 = 14
 	STATE_EX_PAR = 4
+	STATE_EX_26 = 26
 
 
 
@@ -190,6 +192,18 @@ def getCords(s):
 			mincord = min(mincord, i)
 	return (mincord, cc)
 
+def get_ex26(href):
+	with open(dir / href) as file:
+		ansss = []
+		for i in file.readlines():
+			i = i.replace('\n', '')
+			ans1 = []
+			ans = i.split(':')
+			ans1.append(ans[0])
+			ans1.append(ans[1].split(';'))
+			ansss.append(ans1)
+	return ansss
+
 
 def get_ex(href):
 	with open(dir / href) as file:
@@ -236,6 +250,17 @@ def get_word_par(ll):
 	del ans[0][b]
 	if len(ans[0]) < 2: del ll[a]
 	return m, c, v, ll
+
+
+def get_word_26(ll):
+	a = randint(0, len(ll) - 1)
+	ans = ll[a]
+	b = randint(0, len(ans[1]) - 1)
+	c, v = ans[1][b], ans[0]
+	del ans[1][b]
+	if len(ans[1]) == 0: del ll[a]
+	return c, v, ll
+
 
 
 def get_word(ll):
@@ -320,6 +345,11 @@ async def hi_handler(message: Message):
 		this_user.words = shuf(words)
 		this_user._change_kb(['СЛИТНО', 'РАЗДЕЛЬНО'])
 		await do_ex14(message)
+	elif message.text.lower() == '26 задание':
+		words = get_ex26("ex26.txt")
+		this_user.words = shuf(words)
+		this_user._change_kb(['ТРОПЫ', 'СИНТАКСИЧЕСКИЕ СРЕДСТВА', 'СТИЛИСТИЧЕСКИЕ ПРИЁМЫ'], False)
+		await do_ex26(message)
 	elif message.text.lower() == 'паронимы':
 		words = get_ex_par("exPar.txt")
 		this_user.words = shuf(words)
@@ -570,6 +600,59 @@ async def do_exPar(message: Message):
 		await delState(message.peer_id)
 
 
+
+@bot.on.private_message(state=STATE_EX.STATE_EX_26)
+async def do_ex26(message: Message):
+	#try:
+	this_user = users.get(message.peer_id)
+	points = this_user.points
+	did_t = points[0]
+	cor_t = points[1]
+	did_t += 1
+	new_words = this_user.words
+	if this_user.busy == False:
+		get_word_ans, par_word, new_words = get_word_26(new_words) 
+		this_user.words = new_words
+		this_user.check_word = par_word
+		await newState(message.peer_id, STATE_EX.STATE_EX_26)
+		await message.answer(message='Начнем:\n-----------------------------------\n' + get_word_ans, keyboard=this_user.keyboard)
+	else:
+		if message.text.lower() =='стоп':
+			did_t -= 1
+			addBal(2*cor_t-did_t, message.peer_id)
+			await delState(message.peer_id)
+			await message.answer(message=f'{this_user.name}, твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
+			if did_t - cor_t == 1: await message.answer(message='Спишем на брак бота')
+			elif did_t - cor_t == 0: await message.answer(message='Думаю, тут минимум 92 балла в формате ЕГЭ')
+			elif did_t - cor_t < 3: await message.answer(message='Not bad')
+			else:  
+				if this_user.name == 'Илья': await message.answer(message='Даже не верится, что ты Илья 0_0')
+				else: await message.answer(message='Ты не Илья, тебе можно')
+		elif len(new_words) == 0:
+			check_word = this_user.check_word
+			addBal(2*cor_t-did_t, message.peer_id)
+			await delState(message.peer_id)
+			if message.text.lower() == check_word.lower():
+				cor_t += 1
+				await message.answer(message='✅ Верно')
+			else:
+				await message.answer(message='❌ Неверно, ' + check_word)
+			await message.answer(message=f'{this_user.name}, слова закончились. Твой результат: ' + str(cor_t) + '/' + str(did_t), keyboard=end_kb)
+		else:
+			check_word = this_user.check_word
+			get_word_ans, par_word, new_words = get_word_26(new_words) 
+			this_user.words = new_words
+			if message.text.lower() == check_word.lower():
+					cor_t += 1
+					await message.answer(message='✅ Верно' + '\n-----------------------------------\n' + get_word_ans, keyboard=this_user.keyboard)
+			else:
+				await message.answer(message='❌ Неверно, '.upper() + check_word + '\n-----------------------------------\n' + get_word_ans, keyboard=this_user.keyboard)
+			this_user.check_word = par_word
+			await newState(message.peer_id, STATE_EX.STATE_EX_26)
+	this_user.points = (did_t, cor_t)
+	#except:
+	#	await message.answer(message='Возникли проблемы, все починим в скором времени')
+	#	await delState(message.peer_id)
 
 
 
