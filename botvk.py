@@ -90,7 +90,7 @@ users = dict()
 
 bot_kb = (
 	Keyboard(one_time=False, inline=True)
-	.add(Text("ПАРОНИМЫ"), color=KeyboardButtonColor.PRIMARY)
+	.add(Text("5 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
 	.add(Text("7 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
 	.row()
 	.add(Text("10 ЗАДАНИЕ"), color=KeyboardButtonColor.PRIMARY)
@@ -350,7 +350,7 @@ async def hi_handler(message: Message):
 		this_user.words = shuf(words)
 		this_user._change_kb(['ТРОПЫ', 'СИНТАКСИЧЕСКИЕ СРЕДСТВА', 'СТИЛИСТИЧЕСКИЕ ПРИЁМЫ'], False)
 		await do_ex26(message)
-	elif message.text.lower() == 'паронимы':
+	elif message.text.lower() == '5 задание':
 		words = get_ex_par("exPar.txt")
 		this_user.words = shuf(words)
 		await do_exPar(message)
