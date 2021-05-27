@@ -348,7 +348,7 @@ async def hi_handler(message: Message):
 	elif message.text.lower() == '26 задание':
 		words = get_ex26("ex26.txt")
 		this_user.words = shuf(words)
-		this_user._change_kb(['ТРОПЫ', 'СИНТАКСИЧЕСКИЕ СРЕДСТВА', 'СТИЛИСТИЧЕСКИЕ ПРИЁМЫ'], False)
+		this_user._change_kb(['ТРОПЫ', 'СИНТАКСИЧЕСКИЕ СРЕДСТВА', 'СТИЛИСТИЧЕСКИЕ ПРИЁМЫ', 'ЛЕКСИЧЕСКИЕ СРЕДСТВА'], False)
 		await do_ex26(message)
 	elif message.text.lower() == '5 задание':
 		words = get_ex_par("exPar.txt")
